@@ -1,0 +1,142 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  EMOTION VOICE STUDY - DESIGN SYSTEM
+  Research-grade, clinical premium aesthetic
+  Apple-level polish × neuroscience lab × minimal luxury
+*/
+
+@layer base {
+  :root {
+    --background: 210 20% 99%;
+    --foreground: 220 25% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+    --primary: 220 20% 18%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 210 15% 95%;
+    --secondary-foreground: 220 20% 18%;
+    --muted: 210 15% 96%;
+    --muted-foreground: 215 15% 50%;
+    --accent: 210 20% 94%;
+    --accent-foreground: 220 20% 18%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 20% 92%;
+    --input: 210 20% 92%;
+    --ring: 220 15% 40%;
+    --radius: 0.75rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 20% 6%;
+    --foreground: 210 20% 96%;
+    --card: 220 20% 8%;
+    --card-foreground: 210 20% 96%;
+    --popover: 220 20% 8%;
+    --popover-foreground: 210 20% 96%;
+    --primary: 210 20% 96%;
+    --primary-foreground: 220 20% 8%;
+    --secondary: 220 15% 15%;
+    --secondary-foreground: 210 20% 96%;
+    --muted: 220 15% 15%;
+    --muted-foreground: 215 15% 55%;
+    --accent: 220 15% 15%;
+    --accent-foreground: 210 20% 96%;
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
+    --ring: 215 15% 60%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  #root {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+/* Typography - Research Grade */
+@layer components {
+  .sentence-text {
+    @apply text-3xl md:text-4xl lg:text-5xl font-medium leading-relaxed tracking-tight;
+    max-width: 900px;
+    line-height: 1.4;
+    color: hsl(var(--foreground));
+  }
+
+  .emotion-label {
+    @apply text-xs font-semibold uppercase tracking-[0.2em];
+    letter-spacing: 0.25em;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Glassmorphism Continue Button */
+  .continue-button {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1px 2px hsl(220 20% 10% / 0.04), 0 4px 8px hsl(220 20% 10% / 0.04),
+      0 8px 16px hsl(220 20% 10% / 0.02);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .continue-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px hsl(220 20% 10% / 0.06), 0 8px 16px hsl(220 20% 10% / 0.06),
+      0 16px 32px hsl(220 20% 10% / 0.04);
+  }
+
+  .continue-button:active {
+    transform: translateY(0);
+  }
+}
+
+/* Smooth scale utility */
+@layer utilities {
+  .scale-98 {
+    transform: scale(0.98);
+  }
+}
