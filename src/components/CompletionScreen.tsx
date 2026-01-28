@@ -6,6 +6,9 @@ interface CompletionScreenProps {
 }
 
 export const CompletionScreen = ({ logs }: CompletionScreenProps) => {
+  const totalDurationMs = logs.reduce((acc, log) => acc + (log.durationMs || 0), 0);
+  const avgDurationMs = logs.length ? totalDurationMs / logs.length : 0;
+
   const handleExportLogs = () => {
     const dataStr = JSON.stringify(logs, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
@@ -40,9 +43,17 @@ export const CompletionScreen = ({ logs }: CompletionScreenProps) => {
             <p className="text-3xl font-semibold">{uniqueEmotions}</p>
             <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Emotion States</p>
           </div>
+          <div className="rounded-2xl border border-slate-100 bg-slate-50/80 p-5">
+            <p className="text-3xl font-semibold">{(avgDurationMs / 1000).toFixed(1)}s</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Avg Read Time</p>
+          </div>
           <div className="rounded-2xl border border-slate-100 bg-slate-50/80 p-5 col-span-2">
-            <p className="text-3xl font-semibold">{emotionSequence.length}</p>
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Protocol Blocks</p>
+            <p className="text-xl font-semibold text-slate-700">
+              Export JSON to pair with your voice files for downstream ingestion.
+            </p>
+            <p className="mt-2 text-sm text-slate-500">
+              Each record includes emotion label, sentence text, start/end timestamps, duration, and audio URLs when uploaded.
+            </p>
           </div>
         </div>
 

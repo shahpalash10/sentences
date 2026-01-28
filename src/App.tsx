@@ -9,6 +9,9 @@ import { PromptScreen } from "@/components/PromptScreen";
 import { EmotionIntro } from "@/components/EmotionIntro";
 import { SentenceDisplay } from "@/components/SentenceDisplay";
 import { CompletionScreen } from "@/components/CompletionScreen";
+import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import { uploadSentenceLog } from "@/lib/sessionUploader";
+import { isSupabaseConfigured } from "@/lib/supabaseClient";
 
 type Stage = "prompt" | "emotionIntro" | "sentence" | "complete";
 
@@ -19,6 +22,10 @@ export const App = () => {
   const [logs, setLogs] = useState<SessionLog[]>([]);
   const [canContinue, setCanContinue] = useState(false);
   const [sentenceStartedAt, setSentenceStartedAt] = useState<number | null>(null);
+  const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
+  const [elapsedMs, setElapsedMs] = useState(0);
+  const [participantName, setParticipantName] = useState("");
+  const { startRecording, stopRecording, permission, dispose } = useVoiceRecorder();
 
   const currentCategory: EmotionCategory | undefined = emotionSequence[categoryIndex];
   const currentSentence = currentCategory?.sentences[sentenceIndex];
@@ -34,15 +41,21 @@ export const App = () => {
     };
   }, [categoryIndex, currentSentence, sentenceIndex, stage]);
 
-  // Handle start of each sentence: record start time and enable immediate advance
   useEffect(() => {
     if (stage !== "sentence" || !currentSentence) {
       return;
     }
 
     setSentenceStartedAt(Date.now());
+    setElapsedMs(0);
     setCanContinue(true);
-  }, [stage, currentSentence, categoryIndex, sentenceIndex]);
+
+    // start fresh recording per sentence
+    startRecording().catch((error) => {
+      console.error("Unable to start recording", error);
+      setCanContinue(true);
+    });
+  }, [stage, currentSentence, categoryIndex, sentenceIndex, startRecording]);
 
   // Keyboard support for Enter key once continue is enabled
   useEffect(() => {
@@ -58,11 +71,26 @@ export const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canContinue, stage, sentenceIndex, categoryIndex]);
 
-  const startProtocol = () => {
+  // Live timer for UI feedback
+  useEffect(() => {
+    if (!sentenceStartedAt || stage !== "sentence") return;
+
+    const interval = window.setInterval(() => {
+      setElapsedMs(Date.now() - sentenceStartedAt);
+    }, 200);
+
+    return () => clearInterval(interval);
+  }, [sentenceStartedAt, stage]);
+
+  useEffect(() => () => dispose(), [dispose]);
+
+  const startProtocol = (name: string) => {
     setStage("emotionIntro");
     setCategoryIndex(0);
     setSentenceIndex(0);
     setLogs([]);
+    setSessionId(crypto.randomUUID());
+    setParticipantName(name);
   };
 
   const handleBeginEmotion = () => {
@@ -79,22 +107,59 @@ export const App = () => {
     }
   }, [categoryIndex]);
 
-  const handleContinue = useCallback(() => {
+  const handleContinue = useCallback(async () => {
     if (!canContinue || stage !== "sentence" || !currentCategory || !currentSentence) {
       return;
     }
 
-    setLogs((prev) => [
-      ...prev,
-      {
-        emotionId: currentCategory.id,
-        emotionLabel: currentCategory.label,
-        sentenceId: currentSentence.id,
-        sentence: currentSentence.text,
-        startedAt: sentenceStartedAt ? new Date(sentenceStartedAt).toISOString() : new Date().toISOString(),
-        continueClickedAt: new Date().toISOString(),
-      },
-    ]);
+    setCanContinue(false);
+
+    const recording = await stopRecording();
+    const now = new Date();
+    const startedAtIso = recording?.startedAt
+      ? recording.startedAt
+      : sentenceStartedAt
+        ? new Date(sentenceStartedAt).toISOString()
+        : now.toISOString();
+    const endedAtIso = recording?.endedAt ?? now.toISOString();
+    const durationMs = recording?.durationMs ?? (sentenceStartedAt ? now.getTime() - sentenceStartedAt : 0);
+
+    const logEntry: SessionLog = {
+      emotionId: currentCategory.id,
+      emotionLabel: currentCategory.label,
+      sentenceId: currentSentence.id,
+      sentence: currentSentence.text,
+      startedAt: startedAtIso,
+      endedAt: endedAtIso,
+      durationMs,
+      localAudioUrl: recording?.blob ? URL.createObjectURL(recording.blob) : undefined,
+      participantName,
+    };
+
+    setLogs((prev) => [...prev, logEntry]);
+
+    if (recording?.blob && isSupabaseConfigured) {
+      try {
+        const { audioUrl } = await uploadSentenceLog({
+          sessionId,
+          log: logEntry,
+          participantId: participantName,
+          audioBlob: recording.blob,
+        });
+
+        if (audioUrl) {
+          setLogs((prev) => {
+            const next = [...prev];
+            next[next.length - 1] = { ...next[next.length - 1], audioUrl };
+            return next;
+          });
+        }
+      } catch (error) {
+        console.error("Failed to sync with Supabase", error);
+      }
+    } else if (!isSupabaseConfigured) {
+      console.warn("Supabase not configured: set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable uploads.");
+    }
 
     const hasMoreSentences = sentenceIndex < currentCategory.sentences.length - 1;
 
@@ -111,6 +176,9 @@ export const App = () => {
     sentenceIndex,
     stage,
     sentenceStartedAt,
+    stopRecording,
+    sessionId,
+    participantName,
   ]);
 
   if (stage === "prompt") {
@@ -138,6 +206,8 @@ export const App = () => {
         onContinue={handleContinue}
         isButtonEnabled={canContinue}
         accentColor={currentCategory.palette.accent}
+        elapsedMs={elapsedMs}
+        micPermission={permission}
       />
     );
   }

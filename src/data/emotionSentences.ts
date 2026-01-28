@@ -29,7 +29,11 @@ export interface SessionLog {
   sentenceId: number;
   sentence: string;
   startedAt: string;
-  continueClickedAt: string;
+  endedAt: string;
+  durationMs: number;
+  audioUrl?: string;
+  localAudioUrl?: string;
+  participantName?: string;
 }
 
 export const emotionSequence: EmotionCategory[] = [

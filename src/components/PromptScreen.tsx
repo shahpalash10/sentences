@@ -1,8 +1,10 @@
+import { useState } from "react";
 interface PromptScreenProps {
-  onStart: () => void;
+  onStart: (participantName: string) => void;
 }
 
 export const PromptScreen = ({ onStart }: PromptScreenProps) => {
+  const [name, setName] = useState("");
   const checklist = [
     "You'll see sentences grouped by emotional categories",
     "Each sentence remains on screen for five seconds",
@@ -28,9 +30,19 @@ export const PromptScreen = ({ onStart }: PromptScreenProps) => {
               </li>
             ))}
           </ol>
+          <div className="mt-8 space-y-3 text-left">
+            <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Participant Name</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-inner focus:border-slate-400 focus:outline-none"
+            />
+          </div>
           <button
-            onClick={onStart}
-            className="mt-10 inline-flex items-center justify-center rounded-full bg-slate-900 px-10 py-4 text-base font-medium text-white shadow-lg shadow-slate-900/20 transition hover:translate-y-0.5"
+            onClick={() => onStart(name.trim())}
+            disabled={!name.trim()}
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-900 px-10 py-4 text-base font-medium text-white shadow-lg shadow-slate-900/20 transition hover:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Begin Session →
           </button>
