@@ -1,16 +1,20 @@
+import { uiCopy, type Language } from "@/data/i18n";
+
 interface ProgressIndicatorProps {
   current: number;
   total: number;
+  language: Language;
 }
 
-export const ProgressIndicator = ({ current, total }: ProgressIndicatorProps) => {
+export const ProgressIndicator = ({ current, total, language }: ProgressIndicatorProps) => {
   const percent = total === 0 ? 0 : Math.min(1, current / total);
+  const copy = uiCopy[language];
   return (
     <div className="mx-auto mb-10 flex w-full max-w-3xl flex-col gap-3">
       <div className="flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.28em] text-[#7b8394]">
-        <span>Sentence {current}</span>
+        <span>{copy.progressSentence(current)}</span>
         <span>
-          {Math.round(percent * 100)}% • {total} total
+          {Math.round(percent * 100)}% • {copy.progressTotal(total)}
         </span>
       </div>
 

@@ -1,17 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  emotionSequence,
+  getEmotionSequence,
   totalSentences,
   type EmotionCategory,
   type SessionLog,
 } from "@/data/emotionSentences";
+import { uiCopy, type Language } from "@/data/i18n";
 import { PromptScreen } from "@/components/PromptScreen";
 import { EmotionIntro } from "@/components/EmotionIntro";
 import { SentenceDisplay } from "@/components/SentenceDisplay";
 import { CompletionScreen } from "@/components/CompletionScreen";
-import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
-import { uploadSentenceLog } from "@/lib/sessionUploader";
-import { isSupabaseConfigured } from "@/lib/supabaseClient";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 type Stage = "prompt" | "emotionIntro" | "sentence" | "complete";
 
@@ -23,12 +22,15 @@ export const App = () => {
   const [canContinue, setCanContinue] = useState(false);
   const [sentenceStartedAt, setSentenceStartedAt] = useState<number | null>(null);
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
+  const [sessionStartedAtMs, setSessionStartedAtMs] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [participantName, setParticipantName] = useState("");
-  const { startRecording, stopRecording, permission, dispose } = useVoiceRecorder();
+  const [language, setLanguage] = useState<Language>("en");
 
+  const emotionSequence = useMemo(() => getEmotionSequence(language), [language]);
   const currentCategory: EmotionCategory | undefined = emotionSequence[categoryIndex];
   const currentSentence = currentCategory?.sentences[sentenceIndex];
+  const copy = uiCopy[language];
 
   const overallProgress = useMemo(() => {
     const completedBeforeCurrentCategory = emotionSequence
@@ -49,18 +51,12 @@ export const App = () => {
     setSentenceStartedAt(Date.now());
     setElapsedMs(0);
     setCanContinue(true);
+  }, [stage, currentSentence, categoryIndex, sentenceIndex]);
 
-    // start fresh recording per sentence
-    startRecording().catch((error) => {
-      console.error("Unable to start recording", error);
-      setCanContinue(true);
-    });
-  }, [stage, currentSentence, categoryIndex, sentenceIndex, startRecording]);
-
-  // Keyboard support for Enter key once continue is enabled
+  // Keyboard support for Enter/Space to continue
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Enter" && canContinue && stage === "sentence") {
+      if ((event.key === "Enter" || event.key === " ") && canContinue && stage === "sentence") {
         event.preventDefault();
         handleContinue();
       }
@@ -82,14 +78,27 @@ export const App = () => {
     return () => clearInterval(interval);
   }, [sentenceStartedAt, stage]);
 
-  useEffect(() => () => dispose(), [dispose]);
+  const formatLocalTimestamp = useCallback((ms: number) => {
+    const date = new Date(ms);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+    const milliseconds = String(date.getMilliseconds()).padStart(3, "0");
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+  }, []);
 
   const startProtocol = (name: string) => {
+    const now = new Date();
+    const nowMs = now.getTime();
     setStage("emotionIntro");
     setCategoryIndex(0);
     setSentenceIndex(0);
     setLogs([]);
     setSessionId(crypto.randomUUID());
+    setSessionStartedAtMs(nowMs);
     setParticipantName(name);
   };
 
@@ -114,52 +123,29 @@ export const App = () => {
 
     setCanContinue(false);
 
-    const recording = await stopRecording();
     const now = new Date();
-    const startedAtIso = recording?.startedAt
-      ? recording.startedAt
-      : sentenceStartedAt
-        ? new Date(sentenceStartedAt).toISOString()
-        : now.toISOString();
-    const endedAtIso = recording?.endedAt ?? now.toISOString();
-    const durationMs = recording?.durationMs ?? (sentenceStartedAt ? now.getTime() - sentenceStartedAt : 0);
+    const pressedAtMs = now.getTime();
+    const sentenceShownAtMs = sentenceStartedAt ?? pressedAtMs;
+    const sessionStartMs = sessionStartedAtMs ?? pressedAtMs;
+    const durationMs = sentenceStartedAt ? pressedAtMs - sentenceStartedAt : 0;
 
     const logEntry: SessionLog = {
       emotionId: currentCategory.id,
       emotionLabel: currentCategory.label,
       sentenceId: currentSentence.id,
       sentence: currentSentence.text,
-      startedAt: startedAtIso,
-      endedAt: endedAtIso,
+      sessionId,
+      sessionStartedAtMs: sessionStartMs,
+      sessionStartedAtLocal: formatLocalTimestamp(sessionStartMs),
+      sentenceShownAtMs,
+      sentenceShownAtLocal: formatLocalTimestamp(sentenceShownAtMs),
+      continuePressedAtMs: pressedAtMs,
+      continuePressedAtLocal: formatLocalTimestamp(pressedAtMs),
       durationMs,
-      localAudioUrl: recording?.blob ? URL.createObjectURL(recording.blob) : undefined,
       participantName,
     };
 
     setLogs((prev) => [...prev, logEntry]);
-
-    if (recording?.blob && isSupabaseConfigured) {
-      try {
-        const { audioUrl } = await uploadSentenceLog({
-          sessionId,
-          log: logEntry,
-          participantId: participantName,
-          audioBlob: recording.blob,
-        });
-
-        if (audioUrl) {
-          setLogs((prev) => {
-            const next = [...prev];
-            next[next.length - 1] = { ...next[next.length - 1], audioUrl };
-            return next;
-          });
-        }
-      } catch (error) {
-        console.error("Failed to sync with Supabase", error);
-      }
-    } else if (!isSupabaseConfigured) {
-      console.warn("Supabase not configured: set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable uploads.");
-    }
 
     const hasMoreSentences = sentenceIndex < currentCategory.sentences.length - 1;
 
@@ -176,41 +162,60 @@ export const App = () => {
     sentenceIndex,
     stage,
     sentenceStartedAt,
-    stopRecording,
     sessionId,
     participantName,
+    sessionStartedAtMs,
+    formatLocalTimestamp,
   ]);
 
   if (stage === "prompt") {
-    return <PromptScreen onStart={startProtocol} />;
+    return (
+      <>
+        <LanguageToggle language={language} onChange={setLanguage} />
+        <PromptScreen onStart={startProtocol} language={language} />
+      </>
+    );
   }
 
   if (stage === "emotionIntro" && currentCategory) {
     return (
-      <EmotionIntro
-        label={currentCategory.label}
-        description={currentCategory.description}
-        positionText={`Block ${categoryIndex + 1} of ${emotionSequence.length}`}
-        onBegin={handleBeginEmotion}
-      />
+      <>
+        <LanguageToggle language={language} onChange={setLanguage} />
+        <EmotionIntro
+          label={currentCategory.label}
+          description={currentCategory.description}
+          positionText={copy.blockLabel(categoryIndex + 1, emotionSequence.length)}
+          onBegin={handleBeginEmotion}
+          language={language}
+        />
+      </>
     );
   }
 
   if (stage === "sentence" && currentCategory && currentSentence) {
     return (
-      <SentenceDisplay
-        emotionLabel={currentCategory.label}
-        sentence={currentSentence}
-        progressCurrent={overallProgress.current}
-        progressTotal={overallProgress.total}
-        onContinue={handleContinue}
-        isButtonEnabled={canContinue}
-        accentColor={currentCategory.palette.accent}
-        elapsedMs={elapsedMs}
-        micPermission={permission}
-      />
+      <>
+        <LanguageToggle language={language} onChange={setLanguage} />
+        <SentenceDisplay
+          key={currentSentence.id}
+          emotionLabel={currentCategory.label}
+          sentence={currentSentence}
+          progressCurrent={overallProgress.current}
+          progressTotal={overallProgress.total}
+          onContinue={handleContinue}
+          isButtonEnabled={canContinue}
+          accentColor={currentCategory.palette.accent}
+          elapsedMs={elapsedMs}
+          language={language}
+        />
+      </>
     );
   }
 
-  return <CompletionScreen logs={logs} />;
+  return (
+    <>
+      <LanguageToggle language={language} onChange={setLanguage} />
+      <CompletionScreen logs={logs} language={language} />
+    </>
+  );
 };

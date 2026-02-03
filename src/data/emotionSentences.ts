@@ -1,11 +1,11 @@
+import type { Language } from "./i18n";
+
 export type EmotionCategoryId =
   | "neutral_baseline"
   | "high_arousal_positive"
   | "high_arousal_negative"
   | "low_arousal_positive"
-  | "low_arousal_negative"
-  | "high_expectation"
-  | "low_expectation";
+  | "low_arousal_negative";
 
 export interface EmotionSentence {
   id: number;
@@ -28,102 +28,170 @@ export interface SessionLog {
   emotionLabel: string;
   sentenceId: number;
   sentence: string;
-  startedAt: string;
-  endedAt: string;
+  sessionId: string;
+  sessionStartedAtMs: number;
+  sessionStartedAtLocal: string;
+  sentenceShownAtMs: number;
+  sentenceShownAtLocal: string;
+  continuePressedAtMs: number;
+  continuePressedAtLocal: string;
   durationMs: number;
-  audioUrl?: string;
-  localAudioUrl?: string;
   participantName?: string;
 }
 
-export const emotionSequence: EmotionCategory[] = [
+const emotionCategoryDefinitions: Array<{
+  id: EmotionCategoryId;
+  palette: { accent: string; subtle: string };
+  translations: Record<
+    Language,
+    { label: string; description: string; sentences: EmotionSentence[] }
+  >;
+}> = [
   {
     id: "neutral_baseline",
-    label: "Neutral Baseline",
-    description: "Center yourself with a steady, neutral delivery.",
     palette: { accent: "#E3E7F1", subtle: "#6E768C" },
-    sentences: [
-      { id: 1, text: "The meeting is scheduled for three o'clock." },
-      { id: 2, text: "Please place the notebook on the desk." },
-      { id: 3, text: "The train arrives at platform four." },
-      { id: 4, text: "The sample was stored at room temperature." },
-    ],
+    translations: {
+      en: {
+        label: "Neutral Baseline",
+        description: "Center yourself with a steady, neutral delivery.",
+        sentences: [
+          { id: 1, text: "The meeting is scheduled for three o'clock." },
+          { id: 2, text: "Please place the notebook on the desk." },
+          { id: 3, text: "The train arrives at platform four." },
+          { id: 4, text: "The document was uploaded successfully." },
+        ],
+      },
+      ja: {
+        label: "ニュートラル・ベースライン",
+        description: "落ち着いた中立的なトーンで話してください。",
+        sentences: [
+          { id: 1, text: "会議は3時に予定されています。" },
+          { id: 2, text: "ノートを机の上に置いてください。" },
+          { id: 3, text: "列車は4番線に到着します。" },
+          { id: 4, text: "書類は正常にアップロードされました。" },
+        ],
+      },
+    },
   },
   {
     id: "high_arousal_positive",
-    label: "High Arousal Positive",
-    description: "Let the words carry excitement and uplift.",
     palette: { accent: "#F9E6D8", subtle: "#C66C3A" },
-    sentences: [
-      { id: 5, text: "The grant was approved faster than anyone expected!" },
-      { id: 6, text: "We just hit the target and the team is cheering." },
-      { id: 7, text: "The lights came on and the crowd roared to life." },
-      { id: 8, text: "Every sensor reported a perfect score." },
-    ],
+    translations: {
+      en: {
+        label: "High Arousal Positive",
+        description: "Let the words carry excitement and uplift.",
+        sentences: [
+          { id: 5, text: "Everyone cheered when the results were announced." },
+          { id: 6, text: "She jumped with excitement after hearing the news." },
+          { id: 7, text: "The crowd erupted in applause." },
+          { id: 8, text: "He couldn't stop smiling during the celebration." },
+        ],
+      },
+      ja: {
+        label: "高覚醒・ポジティブ",
+        description: "高揚感と喜びをのせて話してください。",
+        sentences: [
+          { id: 5, text: "結果が発表されると、みんなが歓声を上げました。" },
+          { id: 6, text: "その知らせを聞いて、彼女は嬉しさのあまり跳びはねました。" },
+          { id: 7, text: "群衆から拍手が沸き起こりました。" },
+          { id: 8, text: "お祝いの間、彼は笑顔が止まりませんでした。" },
+        ],
+      },
+    },
   },
   {
     id: "high_arousal_negative",
-    label: "High Arousal Negative",
-    description: "Channel urgency, tension, or alarm.",
     palette: { accent: "#F6DADB", subtle: "#A54141" },
-    sentences: [
-      { id: 9, text: "The alarms are blaring and no one is responding." },
-      { id: 10, text: "They ignored the protocol and the sample ruptured." },
-      { id: 11, text: "We are running out of time and the door is locked." },
-      { id: 12, text: "The sky darkened so quickly that the street emptied." },
-    ],
+    translations: {
+      en: {
+        label: "High Arousal Negative",
+        description: "Channel urgency, tension, or alarm.",
+        sentences: [
+          { id: 9, text: "The argument escalated into shouting." },
+          { id: 10, text: "Panic spread quickly through the room." },
+          { id: 11, text: "She slammed the door in anger." },
+          { id: 12, text: "His voice trembled with rage." },
+        ],
+      },
+      ja: {
+        label: "高覚醒・ネガティブ",
+        description: "切迫感や緊張、警戒心を込めて話してください。",
+        sentences: [
+          { id: 9, text: "口論は叫び声にまでエスカレートしました。" },
+          { id: 10, text: "パニックが部屋中に急速に広がりました。" },
+          { id: 11, text: "彼女は怒ってドアを強く閉めました。" },
+          { id: 12, text: "怒りで彼の声が震えました。" },
+        ],
+      },
+    },
   },
   {
     id: "low_arousal_positive",
-    label: "Low Arousal Positive",
-    description: "Speak with calm optimism and warmth.",
     palette: { accent: "#DBF0EA", subtle: "#4A7F70" },
-    sentences: [
-      { id: 13, text: "The lake is still and the cabin lights glow." },
-      { id: 14, text: "Fresh tea is steeping beside the open window." },
-      { id: 15, text: "Every email in the queue is finally answered." },
-      { id: 16, text: "We will review the results together tomorrow." },
-    ],
+    translations: {
+      en: {
+        label: "Low Arousal Positive",
+        description: "Speak with calm optimism and warmth.",
+        sentences: [
+          { id: 13, text: "The lake lies still and the cabin lights glow softly." },
+          { id: 14, text: "Fresh tea is steeping by the open window." },
+          { id: 15, text: "Every email in the queue has been answered." },
+          { id: 16, text: "We'll review the results together tomorrow." },
+        ],
+      },
+      ja: {
+        label: "低覚醒・ポジティブ",
+        description: "穏やかな前向きさと温かさで話してください。",
+        sentences: [
+          { id: 13, text: "湖は静まり、キャビンの明かりが柔らかく灯っています。" },
+          { id: 14, text: "開いた窓のそばで新しいお茶が蒸らされています。" },
+          { id: 15, text: "キューのメールはすべて返信済みです。" },
+          { id: 16, text: "明日、一緒に結果を確認しましょう。" },
+        ],
+      },
+    },
   },
   {
     id: "low_arousal_negative",
-    label: "Low Arousal Negative",
-    description: "Allow weight and heaviness to guide the pacing.",
     palette: { accent: "#E7E3ED", subtle: "#5F5369" },
-    sentences: [
-      { id: 17, text: "The hallway feels longer at this hour." },
-      { id: 18, text: "Another request came in just as we were leaving." },
-      { id: 19, text: "The voicemail light keeps blinking in the dark." },
-      { id: 20, text: "Only two chairs remain around the table." },
-    ],
-  },
-  {
-    id: "high_expectation",
-    label: "High Expectation",
-    description: "Hold a confident, anticipatory tone.",
-    palette: { accent: "#F1E8D7", subtle: "#8A6D36" },
-    sentences: [
-      { id: 21, text: "The envelope is sealed and waiting to be opened." },
-      { id: 22, text: "We double-checked the numbers before submitting." },
-      { id: 23, text: "Everyone paused, listening for the announcement." },
-      { id: 24, text: "The final chord is hanging in the air." },
-    ],
-  },
-  {
-    id: "low_expectation",
-    label: "Low Expectation",
-    description: "Let resignation and acceptance soften the delivery.",
-    palette: { accent: "#E6ECF0", subtle: "#6A7681" },
-    sentences: [
-      { id: 25, text: "The line will probably stay this long all evening." },
-      { id: 26, text: "The report may not change anyone's mind." },
-      { id: 27, text: "We can file the appeal, but nothing is guaranteed." },
-      { id: 28, text: "Tomorrow will look a lot like today." },
-    ],
+    translations: {
+      en: {
+        label: "Low Arousal Negative",
+        description: "Allow weight and heaviness to guide the pacing.",
+        sentences: [
+          { id: 17, text: "The hallway feels longer at this hour." },
+          { id: 18, text: "Another request arrived just as we were leaving." },
+          { id: 19, text: "The voicemail light keeps blinking in the dark." },
+          { id: 20, text: "Only two chairs remain at the table." },
+        ],
+      },
+      ja: {
+        label: "低覚醒・ネガティブ",
+        description: "重さや陰りを感じるペースで話してください。",
+        sentences: [
+          { id: 17, text: "この時間の廊下はいつもより長く感じます。" },
+          { id: 18, text: "出発しようとした矢先に、また依頼が届きました。" },
+          { id: 19, text: "暗闇の中で留守電のランプが点滅し続けています。" },
+          { id: 20, text: "テーブルには椅子があと二脚しか残っていません。" },
+        ],
+      },
+    },
   },
 ];
 
-export const totalSentences = emotionSequence.reduce(
-  (total, category) => total + category.sentences.length,
+export const getEmotionSequence = (language: Language): EmotionCategory[] =>
+  emotionCategoryDefinitions.map((category) => {
+    const translation = category.translations[language];
+    return {
+      id: category.id,
+      label: translation.label,
+      description: translation.description,
+      sentences: translation.sentences,
+      palette: category.palette,
+    };
+  });
+
+export const totalSentences = emotionCategoryDefinitions.reduce(
+  (total, category) => total + category.translations.en.sentences.length,
   0,
 );

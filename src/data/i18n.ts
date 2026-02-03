@@ -1,0 +1,83 @@
+export type Language = "en" | "ja";
+
+export const languageOptions: { id: Language; label: string }[] = [
+  { id: "en", label: "English" },
+  { id: "ja", label: "日本語" },
+];
+
+export const uiCopy = {
+  en: {
+    appTitle: "Emotion Voice Study",
+    appSubtitle:
+      "Research-grade data collection for emotion-conditioned voice analysis",
+    howItWorks: "How It Works",
+    promptChecklist: [
+      "Sentences are grouped by emotional categories",
+      "Each sentence stays on screen until you continue",
+      "Read naturally, as if speaking the emotion aloud",
+      "Progress is linear — stay with the present prompt",
+    ],
+    participantNameLabel: "Participant Name",
+    participantNamePlaceholder: "Enter your name",
+    beginSession: "Begin Session →",
+    estimatedDuration: "Estimated duration: 15–20 minutes",
+    nextEmotion: "Next Emotion",
+    beginSentences: "Begin Sentences →",
+    blockLabel: (current: number, total: number) => `Block ${current} of ${total}`,
+    microphoneBlocked: "Microphone blocked",
+    recording: "Recording",
+    timerLabel: "Timer",
+    continue: "Continue →",
+    pressEnter: "Press Enter or Space to continue",
+    progressSentence: (current: number) => `Sentence ${current}`,
+    progressTotal: (total: number) => `${total} total`,
+    sessionComplete: "Session Complete",
+    completionThanks:
+      "Thank you for contributing to the dataset. This transcript-ready log can now be archived with your recordings and biosignal streams.",
+    sentencesLogged: "Sentences Logged",
+    emotionStates: "Emotion States",
+    avgReadTime: "Avg Read Time",
+    exportPrompt:
+      "Export JSON to pair with your voice files for downstream ingestion.",
+    exportDetails:
+      "Each record includes emotion label, sentence text, start/end timestamps, duration, and local audio URLs.",
+    exportSessionData: "Export Session Data",
+    localDataNote: "Data stays local until you export the JSON log",
+  },
+  ja: {
+    appTitle: "感情音声スタディ",
+    appSubtitle: "感情条件付き音声分析のための研究用データ収集",
+    howItWorks: "進め方",
+    promptChecklist: [
+      "感情カテゴリーごとに文章が表示されます",
+      "各文は「次へ」を押すまで表示されます",
+      "感情を声に出すつもりで自然に読んでください",
+      "進行は順番通りです。表示された文に集中してください",
+    ],
+    participantNameLabel: "参加者名",
+    participantNamePlaceholder: "お名前を入力",
+    beginSession: "セッション開始 →",
+    estimatedDuration: "所要時間目安: 15〜20分",
+    nextEmotion: "次の感情",
+    beginSentences: "文を開始 →",
+    blockLabel: (current: number, total: number) => `ブロック ${current} / ${total}`,
+    microphoneBlocked: "マイクがブロックされています",
+    recording: "録音中",
+    timerLabel: "タイマー",
+    continue: "次へ →",
+    pressEnter: "EnterまたはSpaceで次へ",
+    progressSentence: (current: number) => `文 ${current}`,
+    progressTotal: (total: number) => `全${total}`,
+    sessionComplete: "セッション完了",
+    completionThanks:
+      "ご協力ありがとうございます。文字起こし可能なログを、録音データや生体信号と一緒に保管できます。",
+    sentencesLogged: "記録した文",
+    emotionStates: "感情カテゴリ",
+    avgReadTime: "平均読上げ時間",
+    exportPrompt: "音声ファイルと組み合わせるためのJSONをエクスポートできます。",
+    exportDetails:
+      "各記録には感情ラベル、文、開始/終了時刻、所要時間、ローカル音声URLが含まれます。",
+    exportSessionData: "セッションデータをエクスポート",
+    localDataNote: "JSONをエクスポートするまでデータはローカルに保存されます",
+  },
+};
