@@ -11,13 +11,16 @@ import { EmotionIntro } from "@/components/EmotionIntro";
 import { SentenceDisplay } from "@/components/SentenceDisplay";
 import { CompletionScreen } from "@/components/CompletionScreen";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { PreviewSlide } from "@/components/PreviewSlide";
+import { PracticeComplete } from "@/components/PracticeComplete";
 
-type Stage = "prompt" | "emotionIntro" | "sentence" | "complete";
+type Stage = "preview" | "practice" | "practiceComplete" | "prompt" | "emotionIntro" | "sentence" | "complete";
 
 export const App = () => {
-  const [stage, setStage] = useState<Stage>("prompt");
+  const [stage, setStage] = useState<Stage>("preview");
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [sentenceIndex, setSentenceIndex] = useState(0);
+  const [practiceIndex, setPracticeIndex] = useState(0);
   const [logs, setLogs] = useState<SessionLog[]>([]);
   const [canContinue, setCanContinue] = useState(false);
   const [sentenceStartedAt, setSentenceStartedAt] = useState<number | null>(null);
@@ -31,6 +34,12 @@ export const App = () => {
   const currentCategory: EmotionCategory | undefined = emotionSequence[categoryIndex];
   const currentSentence = currentCategory?.sentences[sentenceIndex];
   const copy = uiCopy[language];
+  const practiceCategory = emotionSequence[0];
+  const practiceSentences = useMemo(
+    () => practiceCategory?.sentences.slice(0, 2) ?? [],
+    [practiceCategory],
+  );
+  const practiceSentence = practiceSentences[practiceIndex];
 
   const overallProgress = useMemo(() => {
     const completedBeforeCurrentCategory = emotionSequence
@@ -44,32 +53,43 @@ export const App = () => {
   }, [categoryIndex, currentSentence, sentenceIndex, stage]);
 
   useEffect(() => {
-    if (stage !== "sentence" || !currentSentence) {
+    const activeSentence =
+      stage === "sentence" ? currentSentence : stage === "practice" ? practiceSentence : undefined;
+
+    if (!activeSentence) {
       return;
     }
 
     setSentenceStartedAt(Date.now());
     setElapsedMs(0);
     setCanContinue(true);
-  }, [stage, currentSentence, categoryIndex, sentenceIndex]);
+  }, [stage, currentSentence, practiceSentence, categoryIndex, sentenceIndex, practiceIndex]);
 
   // Keyboard support for Enter/Space to continue
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
-      if ((event.key === "Enter" || event.key === " ") && canContinue && stage === "sentence") {
+      if (
+        (event.key === "Enter" || event.key === " ") &&
+        canContinue &&
+        (stage === "sentence" || stage === "practice")
+      ) {
         event.preventDefault();
-        handleContinue();
+        if (stage === "practice") {
+          handlePracticeContinue();
+        } else {
+          handleContinue();
+        }
       }
     };
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canContinue, stage, sentenceIndex, categoryIndex]);
+  }, [canContinue, stage, sentenceIndex, categoryIndex, practiceIndex]);
 
   // Live timer for UI feedback
   useEffect(() => {
-    if (!sentenceStartedAt || stage !== "sentence") return;
+    if (!sentenceStartedAt || (stage !== "sentence" && stage !== "practice")) return;
 
     const interval = window.setInterval(() => {
       setElapsedMs(Date.now() - sentenceStartedAt);
@@ -100,6 +120,30 @@ export const App = () => {
     setSessionId(crypto.randomUUID());
     setSessionStartedAtMs(nowMs);
     setParticipantName(name);
+  };
+
+  const startPractice = () => {
+    setPracticeIndex(0);
+    setStage("practice");
+  };
+
+  const handlePracticeContinue = useCallback(() => {
+    if (!canContinue || stage !== "practice" || !practiceSentence) {
+      return;
+    }
+
+    setCanContinue(false);
+
+    const hasMorePractice = practiceIndex < practiceSentences.length - 1;
+    if (hasMorePractice) {
+      setPracticeIndex((prev) => prev + 1);
+    } else {
+      setStage("practiceComplete");
+    }
+  }, [canContinue, practiceIndex, practiceSentence, practiceSentences.length, stage]);
+
+  const beginRealSession = () => {
+    setStage("prompt");
   };
 
   const handleBeginEmotion = () => {
@@ -167,6 +211,50 @@ export const App = () => {
     sessionStartedAtMs,
     formatLocalTimestamp,
   ]);
+
+  if (stage === "preview") {
+    return (
+      <>
+        <LanguageToggle language={language} onChange={setLanguage} />
+        <PreviewSlide language={language} onStartPractice={startPractice} />
+      </>
+    );
+  }
+
+  if (stage === "practice") {
+    return (
+      <>
+        <LanguageToggle language={language} onChange={setLanguage} />
+        <SentenceDisplay
+          key={practiceSentence?.id}
+          emotionLabel={practiceCategory?.label ?? ""}
+          sentence={practiceSentence ?? { id: 0, text: "" }}
+          progressCurrent={practiceIndex + 1}
+          progressTotal={practiceSentences.length}
+          onContinue={handlePracticeContinue}
+          isButtonEnabled={canContinue}
+          accentColor={practiceCategory?.palette.accent ?? "#e0e5ef"}
+          elapsedMs={elapsedMs}
+          language={language}
+        />
+        <div className="fixed inset-x-0 top-5 z-10 flex flex-col items-center gap-2 px-4 text-center">
+          <div className="rounded-full border border-white/70 bg-white/90 px-5 py-2 text-xs font-semibold text-slate-600 shadow-sm">
+            {copy.practiceTag}
+          </div>
+          <p className="max-w-2xl text-xs text-slate-500">{copy.practiceSubtitle}</p>
+        </div>
+      </>
+    );
+  }
+
+  if (stage === "practiceComplete") {
+    return (
+      <>
+        <LanguageToggle language={language} onChange={setLanguage} />
+        <PracticeComplete language={language} onBegin={beginRealSession} />
+      </>
+    );
+  }
 
   if (stage === "prompt") {
     return (
