@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { uiCopy, type Language } from "@/data/i18n";
+
 interface PromptScreenProps {
   onStart: (participantName: string) => void;
   language: Language;

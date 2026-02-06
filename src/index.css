@@ -112,6 +112,7 @@
     transform: translateY(-12px);
   }
 
+
   .emotion-label {
     @apply text-xs font-semibold uppercase tracking-[0.2em];
     letter-spacing: 0.25em;

@@ -56,7 +56,7 @@ export const uiCopy = {
     exportPrompt:
       "Export JSON to pair with your voice files for downstream ingestion.",
     exportDetails:
-      "Each record includes emotion label, sentence text, start/end timestamps, duration, and local audio URLs.",
+      "Each record includes emotion label, sentence text, start/continue timestamps, and duration.",
     exportSessionData: "Export Session Data",
     localDataNote: "Data stays local until you export the JSON log",
   },
@@ -108,7 +108,7 @@ export const uiCopy = {
     avgReadTime: "平均読上げ時間",
     exportPrompt: "音声ファイルと組み合わせるためのJSONをエクスポートできます。",
     exportDetails:
-      "各記録には感情ラベル、文、開始/終了時刻、所要時間、ローカル音声URLが含まれます。",
+      "各記録には感情ラベル、文、開始/続行時刻、所要時間が含まれます。",
     exportSessionData: "セッションデータをエクスポート",
     localDataNote: "JSONをエクスポートするまでデータはローカルに保存されます",
   },

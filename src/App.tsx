@@ -50,7 +50,7 @@ export const App = () => {
       current: completedBeforeCurrentCategory + (stage === "sentence" && currentSentence ? sentenceIndex + 1 : 0),
       total: totalSentences,
     };
-  }, [categoryIndex, currentSentence, sentenceIndex, stage]);
+  }, [categoryIndex, currentSentence, sentenceIndex, stage, emotionSequence]);
 
   useEffect(() => {
     const activeSentence =
@@ -65,7 +65,6 @@ export const App = () => {
     setCanContinue(true);
   }, [stage, currentSentence, practiceSentence, categoryIndex, sentenceIndex, practiceIndex]);
 
-  // Keyboard support for Enter/Space to continue
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if (
@@ -87,7 +86,6 @@ export const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canContinue, stage, sentenceIndex, categoryIndex, practiceIndex]);
 
-  // Live timer for UI feedback
   useEffect(() => {
     if (!sentenceStartedAt || (stage !== "sentence" && stage !== "practice")) return;
 
@@ -111,8 +109,7 @@ export const App = () => {
   }, []);
 
   const startProtocol = (name: string) => {
-    const now = new Date();
-    const nowMs = now.getTime();
+    const nowMs = Date.now();
     setStage("emotionIntro");
     setCategoryIndex(0);
     setSentenceIndex(0);
@@ -158,7 +155,7 @@ export const App = () => {
     } else {
       setStage("complete");
     }
-  }, [categoryIndex]);
+  }, [categoryIndex, emotionSequence.length]);
 
   const handleContinue = useCallback(async () => {
     if (!canContinue || stage !== "sentence" || !currentCategory || !currentSentence) {
@@ -167,8 +164,7 @@ export const App = () => {
 
     setCanContinue(false);
 
-    const now = new Date();
-    const pressedAtMs = now.getTime();
+    const pressedAtMs = Date.now();
     const sentenceShownAtMs = sentenceStartedAt ?? pressedAtMs;
     const sessionStartMs = sessionStartedAtMs ?? pressedAtMs;
     const durationMs = sentenceStartedAt ? pressedAtMs - sentenceStartedAt : 0;
