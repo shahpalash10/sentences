@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { Analytics } from "@vercel/analytics/next";
 import { type SessionLog } from "@/data/emotionSentences";
 import { uiCopy, type Language } from "@/data/i18n";
 
