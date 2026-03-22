@@ -59,6 +59,24 @@ export const uiCopy = {
       "Each record includes emotion label, sentence text, start/continue timestamps, and duration.",
     exportSessionData: "Export Session Data",
     localDataNote: "Data stays local until you export the JSON log",
+    // New strings for UX feedback
+    audioExample: "Play Example Audio",
+    audioPause: "Pause Audio",
+    audioHint: "Listen to an example of the desired vocal tone before you begin.",
+    valenceTitle: "Understanding Emotion Dimensions",
+    valenceExplainer:
+      "Each emotion in this study is described by two dimensions:",
+    valenceDef:
+      "Valence — how pleasant or unpleasant the emotion feels. Positive valence = pleasant (e.g. joy, relief). Negative valence = unpleasant (e.g. anger, sadness).",
+    arousalDef:
+      "Arousal — how energised or calm the emotion feels. High arousal = activated (e.g. excitement, panic). Low arousal = subdued (e.g. contentment, fatigue).",
+    valenceExample: "Example: Excitement = Positive Valence + High Arousal",
+    processOverview: "Experiment Overview",
+    processSteps: [
+      { label: "Practice", detail: "Try the interface with 2 sample sentences — nothing is recorded." },
+      { label: "Neutral Baseline", detail: "Read 5 sentences in a calm, matter-of-fact tone." },
+      { label: "Emotional Quadrants", detail: "Read sentences for 4 emotion types: High Valence + High Arousal, Low Valence + High Arousal, High Valence + Low Arousal, and Low Valence + Low Arousal." },
+    ],
   },
   ja: {
     appTitle: "感情音声スタディ",
@@ -111,5 +129,21 @@ export const uiCopy = {
       "各記録には感情ラベル、文、開始/続行時刻、所要時間が含まれます。",
     exportSessionData: "セッションデータをエクスポート",
     localDataNote: "JSONをエクスポートするまでデータはローカルに保存されます",
+    audioExample: "サンプル音声の再生",
+    audioPause: "一時停止",
+    audioHint: "始める前に、必要な声のトーンの例を聞いてください。",
+    valenceTitle: "感情の次元について",
+    valenceExplainer: "このスタディの感情は2つの次元で表されます：",
+    valenceDef:
+      "快（Valence）— 感情がどれくらい心地よい（または不快）かを表します。高快 = 心地よい（例：喜び、安堵）。低快 = 不快（例：怒り、悲しみ）。",
+    arousalDef:
+      "覚醒（Arousal）— 感情がどれくらい活発（または穏やか）かを表します。高覚醒 = 活性化（例：興奮、パニック）。低覚醒 = 落ち着き（例：満足、疲労）。",
+    valenceExample: "例：興奮 = 高快 + 高覚醒",
+    processOverview: "実験の流れ",
+    processSteps: [
+      { label: "練習", detail: "2つのサンプル文でインターフェースを試します。記録はされません。" },
+      { label: "ニュートラルベースライン", detail: "5つの文を落ち着いたトーンで読んでください。" },
+      { label: "感情の4象限", detail: "4種類の感情（高快・高覚醒、低快・高覚醒、高快・低覚醒、低快・低覚醒）で文を読んでください。" },
+    ],
   },
 };

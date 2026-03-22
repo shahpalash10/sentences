@@ -28,50 +28,59 @@ export const SentenceDisplay = ({
   const seconds = Math.max(0, elapsedMs) / 1000;
   const copy = uiCopy[language];
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-[#f9fbff] to-white px-4">
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#f4f6fa] px-4">
       <ProgressIndicator current={progressCurrent} total={progressTotal} language={language} />
 
-      <div className="text-center">
-        <div
-          className="inline-flex items-center gap-3 rounded-full border bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#7b8394] shadow-sm"
-          style={{ borderColor: `${accentColor}55` }}
-        >
-          <span
-            className="h-2 w-2 rounded-full shadow-[0_0_0_6px_rgba(127,143,255,0.18)]"
-            style={{
-              backgroundColor: accentColor,
-              boxShadow: `0 0 0 6px ${accentColor}22`,
-            }}
-          />
-          {emotionLabel}
-        </div>
-        <h2 className="sentence-text mx-auto mt-6 text-slate-900 transition-opacity duration-500">
-          {sentence.text}
-        </h2>
-
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-sm text-slate-600 shadow-[0_8px_24px_-16px_rgba(46,64,96,0.35)]">
-          <span className="relative flex h-3 w-3 items-center justify-center">
+      {/* Main card — clear bordered container */}
+      <div
+        className="relative w-full max-w-2xl rounded-3xl border bg-white p-10 pt-14 text-center shadow-2xl shadow-slate-200/60 mt-6"
+        style={{ borderColor: `${accentColor}55` }}
+      >
+        {/* Timer — fixed to top-right corner of the card */}
+        <div className="absolute top-5 right-5 inline-flex items-center gap-2 rounded-full border border-slate-100 bg-slate-50 px-3 py-1.5 text-xs text-slate-500 shadow-sm">
+          <span className="relative flex h-2 w-2 items-center justify-center">
             <span
-              className="absolute inline-flex h-full w-full animate-ping rounded-full"
-              style={{ backgroundColor: `${accentColor}66` }}
+              className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+              style={{ backgroundColor: `${accentColor}` }}
             />
             <span
-              className="relative inline-flex h-3 w-3 rounded-full"
+              className="relative inline-flex h-2 w-2 rounded-full"
               style={{ backgroundColor: accentColor }}
             />
           </span>
           {copy.timerLabel}
-          <span className="font-semibold text-slate-800">{seconds.toFixed(1)}s</span>
+          <span className="font-semibold tabular-nums text-slate-700">{seconds.toFixed(1)}s</span>
         </div>
+
+        {/* Emotion pill — sized up, prominent */}
+        <div
+          className="inline-flex items-center gap-3 rounded-full border-2 bg-white px-7 py-3 text-sm font-bold uppercase tracking-[0.2em] shadow-sm"
+          style={{ borderColor: `${accentColor}`, color: "#444" }}
+        >
+          <span
+            className="h-3.5 w-3.5 rounded-full"
+            style={{
+              backgroundColor: accentColor,
+              boxShadow: `0 0 0 5px ${accentColor}33`,
+            }}
+          />
+          {emotionLabel}
+        </div>
+
+        {/* Sentence */}
+        <h2 className="sentence-text mx-auto mt-10 mb-10 text-slate-900 transition-opacity duration-500">
+          {sentence.text}
+        </h2>
       </div>
 
-      <div className="mt-16 flex flex-col items-center gap-4">
+      {/* Continue button below the card */}
+      <div className="mt-8 flex flex-col items-center gap-3">
         <button
           onClick={onContinue}
           disabled={!isButtonEnabled}
           className={[
             "continue-button inline-flex items-center gap-2 rounded-full px-14 py-4 text-base font-semibold transition-all duration-300",
-            isButtonEnabled ? "opacity-100 translate-y-0" : "opacity-60 cursor-not-allowed",
+            isButtonEnabled ? "opacity-100 translate-y-0" : "opacity-50 cursor-not-allowed",
           ].join(" ")}
           style={{
             boxShadow: `0 18px 38px -20px ${accentColor}`,

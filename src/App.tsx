@@ -17,7 +17,7 @@ import { PracticeComplete } from "@/components/PracticeComplete";
 type Stage = "preview" | "practice" | "practiceComplete" | "prompt" | "emotionIntro" | "sentence" | "complete";
 
 export const App = () => {
-  const [stage, setStage] = useState<Stage>("preview");
+  const [stage, setStage] = useState<Stage>("practice");
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [sentenceIndex, setSentenceIndex] = useState(0);
   const [practiceIndex, setPracticeIndex] = useState(0);
@@ -269,6 +269,7 @@ export const App = () => {
           label={currentCategory.label}
           description={currentCategory.description}
           positionText={copy.blockLabel(categoryIndex + 1, emotionSequence.length)}
+          audioFile={currentCategory.audioFile}
           onBegin={handleBeginEmotion}
           language={language}
         />
