@@ -62,20 +62,19 @@ export const uiCopy = {
     // New strings for UX feedback
     audioExample: "Play Example Audio",
     audioPause: "Pause Audio",
-    audioHint: "Listen to an example of the desired vocal tone before you begin.",
-    valenceTitle: "Understanding Emotion Dimensions",
-    valenceExplainer:
-      "Each emotion in this study is described by two dimensions:",
+    audioHint: "Listen to an example of the desired tone before you begin.",
+    valenceTitle: "About the Emotions in This Study",
+    valenceExplainer: "You will read sentences in 5 different emotional states. Each one is a combination of two things:",
     valenceDef:
-      "Valence — how pleasant or unpleasant the emotion feels. Positive valence = pleasant (e.g. joy, relief). Negative valence = unpleasant (e.g. anger, sadness).",
+      "How good or bad it feels — for example, joy feels good, anger feels bad.",
     arousalDef:
-      "Arousal — how energised or calm the emotion feels. High arousal = activated (e.g. excitement, panic). Low arousal = subdued (e.g. contentment, fatigue).",
-    valenceExample: "Example: Excitement = Positive Valence + High Arousal",
-    processOverview: "Experiment Overview",
+      "How energised or tired it feels — for example, excitement feels energised, sadness feels tired.",
+    valenceExample: "Example: Excitement = feels good + feels energised",
+    processOverview: "What will happen",
     processSteps: [
-      { label: "Practice", detail: "Try the interface with 2 sample sentences — nothing is recorded." },
-      { label: "Neutral Baseline", detail: "Read 5 sentences in a calm, matter-of-fact tone." },
-      { label: "Emotional Quadrants", detail: "Read sentences for 4 emotion types: High Valence + High Arousal, Low Valence + High Arousal, High Valence + Low Arousal, and Low Valence + Low Arousal." },
+      { label: "Practice", detail: "Try 2 sentences to get used to the screen — nothing is recorded." },
+      { label: "Neutral", detail: "Read 5 sentences in a calm, flat tone — like you're just stating a fact." },
+      { label: "4 Emotion Types", detail: "Read sentences for Joy & Excitement, Stress & Panic, Calm & Relaxed, and Sad & Tired." },
     ],
   },
   ja: {
@@ -131,19 +130,19 @@ export const uiCopy = {
     localDataNote: "JSONをエクスポートするまでデータはローカルに保存されます",
     audioExample: "サンプル音声の再生",
     audioPause: "一時停止",
-    audioHint: "始める前に、必要な声のトーンの例を聞いてください。",
-    valenceTitle: "感情の次元について",
-    valenceExplainer: "このスタディの感情は2つの次元で表されます：",
+    audioHint: "始める前に、声のトーンの例を聞いてください。",
+    valenceTitle: "この実験の感情について",
+    valenceExplainer: "5種類の感情状態で文章を読んでいただきます。それぞれ2つのポイントの組み合わせです：",
     valenceDef:
-      "快（Valence）— 感情がどれくらい心地よい（または不快）かを表します。高快 = 心地よい（例：喜び、安堵）。低快 = 不快（例：怒り、悲しみ）。",
+      "気持ちのよさ — 例えば、喜びは気持ちよく、怒りは不快です。",
     arousalDef:
-      "覚醒（Arousal）— 感情がどれくらい活発（または穏やか）かを表します。高覚醒 = 活性化（例：興奮、パニック）。低覚醒 = 落ち着き（例：満足、疲労）。",
-    valenceExample: "例：興奮 = 高快 + 高覚醒",
-    processOverview: "実験の流れ",
+      "エネルギーの高さ — 例えば、興奮は元気があり、悲しみは疲れている感じです。",
+    valenceExample: "例：興奮 = 気持ちよい + エネルギーが高い",
+    processOverview: "進め方",
     processSteps: [
-      { label: "練習", detail: "2つのサンプル文でインターフェースを試します。記録はされません。" },
-      { label: "ニュートラルベースライン", detail: "5つの文を落ち着いたトーンで読んでください。" },
-      { label: "感情の4象限", detail: "4種類の感情（高快・高覚醒、低快・高覚醒、高快・低覚醒、低快・低覚醒）で文を読んでください。" },
+      { label: "練習", detail: "2文で画面に慣れましょう — 記録はされません。" },
+      { label: "ニュートラル", detail: "5文を落ち着いたトーンで、ただ事実を述べるように読んでください。" },
+      { label: "4種類の感情", detail: "喜び・興奮、ストレス・パニック、落ち着き・リラックス、悲しみ・疲れの感情で文を読んでください。" },
     ],
   },
 };
