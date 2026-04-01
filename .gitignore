@@ -1,3 +1,6 @@
+# Separate experiment — keep out of repo
+new_web/
+
 # Node
 node_modules/
 dist/

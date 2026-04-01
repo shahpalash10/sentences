@@ -1,6 +1,22 @@
 import { useState, useRef } from "react";
 import { uiCopy, type Language } from "@/data/i18n";
 
+
+const playBeep = () => {
+  const ctx = new AudioContext();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.value = 880;
+  osc.type = "sine";
+  gain.gain.setValueAtTime(0.7, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.2);
+  osc.onended = () => ctx.close();
+};
+
 interface EmotionIntroProps {
   label: string;
   description: string;
@@ -64,7 +80,7 @@ export const EmotionIntro = ({
 
       <p className="mt-8 text-sm tracking-[0.3em] text-slate-400">{positionText}</p>
       <button
-        onClick={onBegin}
+        onClick={() => { playBeep(); onBegin(); }}
         className="mt-6 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-8 py-3 text-sm font-medium text-slate-700 shadow-sm transition duration-300 hover:-translate-y-0.5"
       >
         {copy.beginSentences}
